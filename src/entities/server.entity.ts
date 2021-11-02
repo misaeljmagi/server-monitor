@@ -10,7 +10,7 @@ import {
 import { Alert } from 'src/interfaces/alert.interface';
 import { AlertEntity } from './alert.entity';
 
-@Entity()
+@Entity('servers')
 export class ServerEntity implements Server {
   @PrimaryGeneratedColumn()
   id: number;
