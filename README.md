@@ -22,3 +22,6 @@ $ yarn start:dev
 
 ```
 
+## Docs
+Please refer to Swagger for this application at `BASE_URL/docs`
+
