@@ -6,15 +6,36 @@ import { Repository } from 'typeorm';
 import { ServersResponseDto } from './dto/server-response.dto';
 import { CreateServerRequestDto } from './dto/create-server-request.dto';
 import { isEmpty } from 'lodash';
+import { AlertEntity } from 'src/entities/alert.entity';
 
 @Injectable()
 export class ServersService {
   constructor(
+    @InjectRepository(AlertEntity)
+    private readonly alertRepository: Repository<AlertEntity>,
     @InjectRepository(ServerEntity)
     private readonly serverRepository: Repository<ServerEntity>,
   ) {}
   async getAllServers(): Promise<ServersResponseDto[]> {
     return this.serverRepository.find();
+  }
+
+  async getTopFailingServers(): Promise<
+    ServersResponseDto & { alertCount: number }[]
+  > {
+    return this.alertRepository
+      .createQueryBuilder('alerts')
+      .select('server.name as name')
+      .addSelect('server.type as type')
+      .addSelect('count(*) as alertCount')
+      .innerJoin('alerts.server', 'server')
+      .groupBy('alerts.server')
+      .where('YEAR(alerts.created_at) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
+      .andWhere(
+        'MONTH(alerts.created_at) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)',
+      )
+      .limit(3)
+      .getRawMany() as any;
   }
 
   async addServer(

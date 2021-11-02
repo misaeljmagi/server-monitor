@@ -19,6 +19,17 @@ export class ServersController {
     return this.serversService.getAllServers();
   }
 
+  @Get('/top-failing')
+  @ApiOperation({
+    summary: 'Get top failing servers',
+    description: 'Gets top 3 servers with the most alerts',
+  })
+  getTopFailingServers(): Promise<
+    ServersResponseDto & { alertCount: number }[]
+  > {
+    return this.serversService.getTopFailingServers();
+  }
+
   @Post('')
   @ApiOperation({
     summary: 'Add server',
